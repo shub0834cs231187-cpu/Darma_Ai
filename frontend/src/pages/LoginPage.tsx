@@ -76,7 +76,7 @@ export default function LoginPage() {
               type="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="you@example.com"
+              placeholder="Enter your email"
               required
             />
 
@@ -86,7 +86,7 @@ export default function LoginPage() {
               type="password"
               value={formData.password}
               onChange={handleChange}
-              placeholder="••••••••"
+              placeholder="Enter your password"
               required
             />
 

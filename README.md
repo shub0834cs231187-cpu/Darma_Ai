@@ -18,12 +18,12 @@ Frontend runs on `http://localhost:5173`
 
 ```bash
 cd backend
-pip install -r requirements.txt
-python init_db.py
-uvicorn main:app --reload
+npm install
+npm run seed
+npm run dev
 ```
 
-Backend runs on `http://localhost:8000`
+Backend runs on `http://localhost:5000`
 
 ## Tech Stack
 
@@ -38,10 +38,8 @@ Backend runs on `http://localhost:8000`
 - Zustand (State Management)
 
 **Backend:**
-- FastAPI
-- Python
-- SQLAlchemy ORM
-- PostgreSQL
+- Node.js + Express.js
+- MongoDB + Mongoose
 - JWT Authentication
 - Cloudinary (Image Storage)
 - Razorpay (Payments)
@@ -92,7 +90,7 @@ TMM/
 
 ### Frontend (.env)
 ```
-VITE_API_URL=http://localhost:8000
+VITE_API_URL=http://localhost:5000
 VITE_GOOGLE_CLIENT_ID=your-google-client-id
 VITE_RAZORPAY_KEY_ID=your-razorpay-key-id
 ```
@@ -106,7 +104,14 @@ CLOUDINARY_API_KEY=your-api-key
 CLOUDINARY_API_SECRET=your-api-secret
 RAZORPAY_KEY_ID=your-razorpay-key-id
 RAZORPAY_KEY_SECRET=your-razorpay-key-secret
+GEMINI_API_KEY=your-gemini-api-key
+GEMINI_MODEL=gemini-2.5-flash
 ```
+
+`GEMINI_API_KEY` is used only by the backend. The Product Analyzer searches the
+local catalogue first, then asks Gemini for an educational product summary when
+the requested product is not in the catalogue. Review the product packaging
+before relying on an ingredient summary, since formulas can change by region.
 
 ## API Documentation
 

@@ -1,11 +1,11 @@
-import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuthStore } from '../services/store';
 
 export default function PublicRoute() {
-  const { token } = useAuthStore();
+  const { token, user } = useAuthStore();
 
-  if (token) {
+  // A stale token without a saved user must not block the sign-in screens.
+  if (token && user) {
     return <Navigate to="/dashboard" replace />;
   }
 

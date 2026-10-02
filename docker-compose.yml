@@ -1,40 +1,39 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  postgres:
-    image: postgres:15-alpine
-    environment:
-      POSTGRES_USER: dermaai_user
-      POSTGRES_PASSWORD: dermaai_password
-      POSTGRES_DB: dermaai_db
+  mongo:
+    image: mongo:7
     ports:
-      - "5432:5432"
+      - "27017:27017"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - mongo_data:/data/db
 
   backend:
     build: ./backend
     ports:
-      - "8000:8000"
+      - "5000:5000"
     environment:
-      DATABASE_URL: postgresql://dermaai_user:dermaai_password@postgres/dermaai_db
-      ENVIRONMENT: development
+      MONGO_URI: mongodb://mongo:27017/darmaai_db
+      PORT: 5000
+      NODE_ENV: development
+      FRONTEND_URL: http://localhost:5173
     depends_on:
-      - postgres
+      - mongo
     volumes:
       - ./backend:/app
-    command: uvicorn main:app --host 0.0.0.0 --reload
+      - /app/node_modules
+    command: sh -c "npm install && npm run dev"
 
   frontend:
     build: ./frontend
     ports:
       - "5173:5173"
     environment:
-      VITE_API_URL: http://localhost:8000
+      VITE_API_URL: http://localhost:5000
     depends_on:
       - backend
     volumes:
       - ./frontend:/app
 
 volumes:
-  postgres_data:
+  mongo_data:

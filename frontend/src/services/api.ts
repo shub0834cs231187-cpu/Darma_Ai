@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -41,6 +41,8 @@ export const authAPI = {
     api.post('/auth/verify-email', { token }),
   forgotPassword: (email: string) =>
     api.post('/auth/forgot-password', { email }),
+  verifyPasswordResetOtp: (email: string, otp: string) =>
+    api.post('/auth/verify-password-reset-otp', { email, otp }),
   resetPassword: (token: string, password: string) =>
     api.post('/auth/reset-password', { token, password }),
   getCurrentUser: () =>
@@ -92,7 +94,7 @@ export const analysisAPI = {
 
 export const productAPI = {
   searchProducts: (query: string, page: number = 1) =>
-    api.get(`/products/search?q=${query}&page=${page}`),
+    api.get(`/products/search?q=${encodeURIComponent(query)}&page=${page}`),
   getProductDetail: (id: string) =>
     api.get(`/products/${id}`),
   analyzeProduct: (productId: string) =>

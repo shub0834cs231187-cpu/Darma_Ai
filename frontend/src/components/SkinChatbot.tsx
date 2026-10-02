@@ -88,7 +88,7 @@ export default function SkinChatbot({ isOpen, onClose }: SkinChatbotProps) {
                 </div>
                 <div>
                   <h2 className="text-base font-bold text-dark-900 dark:text-background">AI Skin Analysis</h2>
-                  <p className="text-xs text-dark-500 dark:text-dark-400">Powered by Gemini</p>
+                  <p className="text-xs text-dark-500 dark:text-dark-400">Personalized skincare guidance</p>
                 </div>
               </div>
               <button

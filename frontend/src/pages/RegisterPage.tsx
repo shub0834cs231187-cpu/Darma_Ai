@@ -81,7 +81,7 @@ export default function RegisterPage() {
                 name="first_name"
                 value={formData.first_name}
                 onChange={handleChange}
-                placeholder="John"
+                placeholder="Enter your first name"
                 required
               />
               <Input
@@ -89,7 +89,7 @@ export default function RegisterPage() {
                 name="last_name"
                 value={formData.last_name}
                 onChange={handleChange}
-                placeholder="Doe"
+                placeholder="Enter your last name"
                 required
               />
             </div>
@@ -100,7 +100,7 @@ export default function RegisterPage() {
               type="email"
               value={formData.email}
               onChange={handleChange}
-              placeholder="you@example.com"
+              placeholder="Enter your email"
               required
             />
 
@@ -110,7 +110,7 @@ export default function RegisterPage() {
               type="password"
               value={formData.password}
               onChange={handleChange}
-              placeholder="••••••••"
+              placeholder="Enter your password"
               required
             />
 

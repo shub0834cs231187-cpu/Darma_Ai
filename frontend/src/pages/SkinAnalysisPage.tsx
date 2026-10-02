@@ -5,10 +5,9 @@ import Footer from '../components/Footer';
 import Card from '../components/Card';
 import Button from '../components/Button';
 import Alert from '../components/Alert';
-import Skeleton from '../components/Skeleton';
 import { analysisAPI } from '../services/api';
 import { useAuthStore } from '../services/store';
-import { Upload, Loader } from 'lucide-react';
+import { Camera, Upload } from 'lucide-react';
 
 export default function SkinAnalysisPage() {
   const { user } = useAuthStore();
@@ -17,18 +16,83 @@ export default function SkinAnalysisPage() {
   const [isLoading, setIsLoading] = React.useState(false);
   const [alert, setAlert] = React.useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [analysis, setAnalysis] = React.useState<any>(null);
+  const [cameraStream, setCameraStream] = React.useState<MediaStream | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
+  const videoRef = React.useRef<HTMLVideoElement>(null);
+  const streamRef = React.useRef<MediaStream | null>(null);
+
+  const stopCamera = React.useCallback(() => {
+    streamRef.current?.getTracks().forEach((track) => track.stop());
+    streamRef.current = null;
+    setCameraStream(null);
+  }, []);
+
+  React.useEffect(() => {
+    if (cameraStream && videoRef.current) {
+      videoRef.current.srcObject = cameraStream;
+      videoRef.current.play().catch(() => undefined);
+    }
+  }, [cameraStream]);
+
+  React.useEffect(() => stopCamera, [stopCamera]);
+
+  const selectImage = (file: File) => {
+    setImage(file);
+    setAnalysis(null);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
 
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setImage(file);
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreview(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+      selectImage(file);
     }
+  };
+
+  const startCamera = async () => {
+    if (!navigator.mediaDevices?.getUserMedia) {
+      setAlert({ type: 'error', message: 'Camera access is not supported by this browser.' });
+      return;
+    }
+
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: 'user' } },
+        audio: false,
+      });
+      streamRef.current = stream;
+      setCameraStream(stream);
+      setAlert(null);
+    } catch (error) {
+      console.error('Camera access error:', error);
+      setAlert({ type: 'error', message: 'Unable to access the camera. Please allow camera permission and try again.' });
+    }
+  };
+
+  const capturePhoto = () => {
+    const video = videoRef.current;
+    if (!video || !video.videoWidth || !video.videoHeight) {
+      setAlert({ type: 'error', message: 'The camera is still starting. Please try again.' });
+      return;
+    }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    canvas.getContext('2d')?.drawImage(video, 0, 0, canvas.width, canvas.height);
+    canvas.toBlob((blob) => {
+      if (!blob) {
+        setAlert({ type: 'error', message: 'Could not capture the photo. Please try again.' });
+        return;
+      }
+
+      selectImage(new File([blob], `skin-analysis-${Date.now()}.jpg`, { type: 'image/jpeg' }));
+      stopCamera();
+    }, 'image/jpeg', 0.92);
   };
 
   const getScoreColor = (score: number, isInverted?: boolean) => {
@@ -100,7 +164,27 @@ export default function SkinAnalysisPage() {
                   Upload Image
                 </h2>
 
-                {!preview ? (
+                {cameraStream ? (
+                  <div>
+                    <video
+                      ref={videoRef}
+                      autoPlay
+                      playsInline
+                      muted
+                      className="w-full rounded-lg mb-4 bg-dark-900"
+                    />
+                    <div className="grid grid-cols-2 gap-3">
+                      <Button type="button" onClick={capturePhoto}>
+                        <Camera className="w-4 h-4 inline mr-2" />
+                        Capture Photo
+                      </Button>
+                      <Button type="button" variant="outline" onClick={stopCamera}>
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                ) : !preview ? (
+                  <>
                   <div
                     onClick={() => fileInputRef.current?.click()}
                     className="border-2 border-dashed border-primary-300 dark:border-primary-700 rounded-lg p-12 text-center cursor-pointer hover:border-primary-500 transition"
@@ -113,6 +197,16 @@ export default function SkinAnalysisPage() {
                       PNG, JPG up to 10MB
                     </p>
                   </div>
+                    <div className="flex items-center gap-3 my-4 text-sm text-dark-500 dark:text-dark-400">
+                      <span className="h-px flex-1 bg-dark-200 dark:bg-dark-700" />
+                      <span>or</span>
+                      <span className="h-px flex-1 bg-dark-200 dark:bg-dark-700" />
+                    </div>
+                    <Button type="button" variant="outline" onClick={startCamera} className="w-full">
+                      <Camera className="w-4 h-4 inline mr-2" />
+                      Use Camera
+                    </Button>
+                  </>
                 ) : (
                   <div>
                     <img
@@ -124,6 +218,7 @@ export default function SkinAnalysisPage() {
                       size="sm"
                       variant="outline"
                       onClick={() => {
+                        stopCamera();
                         setImage(null);
                         setPreview(null);
                         setAnalysis(null);

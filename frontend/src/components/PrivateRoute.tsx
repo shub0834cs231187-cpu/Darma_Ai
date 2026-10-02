@@ -1,11 +1,10 @@
-import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuthStore } from '../services/store';
 
 export default function PrivateRoute() {
-  const { token } = useAuthStore();
+  const { token, user } = useAuthStore();
 
-  if (!token) {
+  if (!token || !user) {
     return <Navigate to="/login" replace />;
   }
 

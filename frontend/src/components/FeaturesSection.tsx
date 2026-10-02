@@ -1,28 +1,41 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Microscope, Pill, TrendingUp, Target } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Microscope, Pill, TrendingUp, Target, type LucideIcon } from 'lucide-react';
 import Card from './Card';
 
-const features = [
+interface Feature {
+  icon: LucideIcon;
+  title: string;
+  description: string;
+  action?: 'chat';
+  path?: string;
+}
+
+const features: Feature[] = [
   {
     icon: Microscope,
     title: 'AI Skin Analysis',
     description: 'Advanced image recognition to analyze your skin condition in seconds.',
+    action: 'chat',
   },
   {
     icon: Pill,
     title: 'Product Analyzer',
     description: 'Check product ingredients for compatibility with your skin type.',
+    path: '/product-analyzer',
   },
   {
     icon: TrendingUp,
     title: 'Trend Tracking',
     description: 'Monitor your skin health improvements over time with charts.',
+    path: '/trend-tracking',
   },
   {
     icon: Target,
     title: 'Personalized Routines',
     description: 'Get custom morning and night skincare routines.',
+    path: '/recommendations',
   },
 ];
 
@@ -31,6 +44,8 @@ interface FeaturesSectionProps {
 }
 
 export default function FeaturesSection({ onOpenSkinChat }: FeaturesSectionProps) {
+  const navigate = useNavigate();
+
   return (
     <section id="features" className="py-20 px-4 md:px-8 bg-white dark:bg-dark-900">
       <div className="max-w-7xl mx-auto">
@@ -63,8 +78,8 @@ export default function FeaturesSection({ onOpenSkinChat }: FeaturesSectionProps
                 <Card className="h-full p-6 text-center">
                   <button
                     type="button"
-                    onClick={feature.title === 'AI Skin Analysis' ? onOpenSkinChat : undefined}
-                    className={`w-full ${feature.title === 'AI Skin Analysis' ? 'cursor-pointer' : 'cursor-default'}`}
+                    onClick={() => feature.action === 'chat' ? onOpenSkinChat() : navigate(feature.path!)}
+                    className="w-full cursor-pointer"
                   >
                   <div className="w-12 h-12 bg-primary-100 dark:bg-primary-900/30 rounded-lg flex items-center justify-center mx-auto mb-4">
                     <Icon className="w-6 h-6 text-primary-600" />

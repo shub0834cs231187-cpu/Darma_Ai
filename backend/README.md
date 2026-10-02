@@ -1,31 +1,28 @@
-# DermaAI Backend
-AI-powered skin analysis and recommendation system
+# DermaAI Backend (Express + MongoDB)
 
 ## Setup
 
 1. Install dependencies:
 ```bash
-pip install -r requirements.txt
+npm install
 ```
 
-2. Set up environment variables:
+2. Configure environment:
 ```bash
 cp .env.example .env
-# Edit .env with your credentials
 ```
 
-3. Initialize database:
+3. Seed data (optional but recommended):
 ```bash
-python init_db.py
+npm run seed
 ```
 
-4. Run the server:
+4. Start server:
 ```bash
-uvicorn main:app --reload
+npm run dev
 ```
 
-The API will be available at http://localhost:8000
-API documentation at http://localhost:8000/docs
+Backend runs at `http://localhost:5000`.
 
 ## API Endpoints
 
@@ -41,4 +38,4 @@ API documentation at http://localhost:8000/docs
 
 ## Database
 
-PostgreSQL is required. Update DATABASE_URL in .env with your connection string.
+MongoDB is required. Update `MONGO_URI` in `.env`.

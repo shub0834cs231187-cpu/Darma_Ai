@@ -8,11 +8,11 @@
     "backend"
   ],
   "scripts": {
-    "install-all": "npm install && cd frontend && npm install",
-    "dev": "concurrently \"cd frontend && npm run dev\" \"cd backend && uvicorn main:app --reload\"",
+    "install-all": "npm install",
+    "dev": "concurrently \"cd frontend && npm run dev\" \"cd backend && npm run dev\"",
     "build": "cd frontend && npm run build",
     "start-frontend": "cd frontend && npm run dev",
-    "start-backend": "cd backend && uvicorn main:app --reload"
+    "start-backend": "cd backend && npm run dev"
   },
   "devDependencies": {
     "concurrently": "^8.2.0"

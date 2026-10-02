@@ -3,11 +3,10 @@ import { motion } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Card from '../components/Card';
-import Button from '../components/Button';
 import Skeleton from '../components/Skeleton';
-import { analysisAPI, recommendationAPI } from '../services/api';
+import { analysisAPI } from '../services/api';
 import { useAuthStore } from '../services/store';
-import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { Activity, TrendingUp, Heart, AlertCircle } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -31,6 +30,7 @@ export default function DashboardPage() {
   }, []);
 
   const recentAnalysis = analyses[0];
+  const hasAnalyses = analyses.length > 0;
   const chartData = analyses.slice(0, 7).reverse().map((analysis, index) => ({
     date: `Day ${index + 1}`,
     score: analysis.skin_score,
@@ -79,43 +79,54 @@ export default function DashboardPage() {
             className="mb-8"
           >
             <h1 className="text-4xl font-bold text-dark-900 dark:text-background mb-2">
-              Welcome back, {user?.first_name}!
+              {hasAnalyses ? 'Welcome back' : 'Welcome'}, {user?.first_name}!
             </h1>
             <p className="text-dark-600 dark:text-dark-400">
-              Track your skin health journey
+              {hasAnalyses ? 'Track your skin health journey' : 'Start your personalized skin health journey'}
             </p>
           </motion.div>
 
-          {/* Stats Grid */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="grid md:grid-cols-4 gap-6 mb-8"
-          >
-            {[
-              { label: 'Analyses', value: analyses.length, icon: Activity },
-              { label: 'Avg Score', value: analyses.length > 0 ? Math.round(analyses.reduce((a, b) => a + b.skin_score, 0) / analyses.length) : 0, icon: TrendingUp },
-              { label: 'Current Status', value: recentAnalysis?.skin_type || 'Pending', icon: Heart },
-            ].map((stat, index) => {
-              const Icon = stat.icon;
-              return (
-                <Card key={index} className="p-6">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-dark-600 dark:text-dark-400 text-sm mb-1">
-                        {stat.label}
-                      </p>
-                      <p className="text-3xl font-bold text-dark-900 dark:text-background">
-                        {loading ? <Skeleton className="h-8 w-12" /> : stat.value}
-                      </p>
+          {hasAnalyses ? (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="grid md:grid-cols-4 gap-6 mb-8"
+            >
+              {[
+                { label: 'Analyses', value: analyses.length, icon: Activity },
+                { label: 'Avg Score', value: Math.round(analyses.reduce((a, b) => a + b.skin_score, 0) / analyses.length), icon: TrendingUp },
+                { label: 'Current Status', value: recentAnalysis?.skin_type || 'Pending', icon: Heart },
+              ].map((stat, index) => {
+                const Icon = stat.icon;
+                return (
+                  <Card key={index} className="p-6">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-dark-600 dark:text-dark-400 text-sm mb-1">
+                          {stat.label}
+                        </p>
+                        <p className="text-3xl font-bold text-dark-900 dark:text-background">
+                          {loading ? <Skeleton className="h-8 w-12" /> : stat.value}
+                        </p>
+                      </div>
+                      <Icon className="w-8 h-8 text-primary-600 opacity-20" />
                     </div>
-                    <Icon className="w-8 h-8 text-primary-600 opacity-20" />
-                  </div>
-                </Card>
-              );
-            })}
-          </motion.div>
+                  </Card>
+                );
+              })}
+            </motion.div>
+          ) : !loading ? (
+            <Card className="p-8 mb-8 text-center">
+              <AlertCircle className="w-12 h-12 text-primary-600 mx-auto mb-4" />
+              <h2 className="text-xl font-bold text-dark-900 dark:text-background mb-2">
+                Your dashboard is ready
+              </h2>
+              <p className="text-dark-600 dark:text-dark-400">
+                Complete your first skin analysis to see your personalized scores and trends here.
+              </p>
+            </Card>
+          ) : null}
 
           {/* Recent Analysis */}
           {recentAnalysis && (
